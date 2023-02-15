@@ -50,7 +50,7 @@ class userController {
       return res.status(400).json(error.message);
     }
   }
-  static async destroy(req, res) {
+  static async delete(req, res) {
     try {
       const { id } = req.params;
       const user = await users.destroy({
