@@ -28,7 +28,16 @@ class userController {
   static async showAll(req, res) {
     try {
       const userAll = await users.findAll();
-      return res.status(200).json(userAll);
+      //show without password
+      return res.status(200).json(
+        userAll.map((user) => {
+          return {
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          };
+        })
+      );
     } catch (error) {
       return res.status(400).json(error.message);
     }
@@ -37,7 +46,14 @@ class userController {
     try {
       const { id } = req.params;
       const user = await users.findByPk(id);
-      return res.status(200).json(user);
+      return res.status(200).json({
+        message: "User found successfully",
+        data: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      });
     } catch (error) {
       return res.status(400).json(error.message);
     }
