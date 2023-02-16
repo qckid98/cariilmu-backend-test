@@ -9,18 +9,19 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       user_courses.belongsTo(models.users, {
-        foreignKey: "user_id",
+        foreignKey: "userId",
         as: "user",
       });
       user_courses.belongsTo(models.courses, {
-        foreignKey: "course_id",
+        foreignKey: "courseId",
         as: "course",
       });
     }
   }
   user_courses.init(
     {
-      description: DataTypes.STRING,
+      userId: DataTypes.INTEGER,
+      courseId: DataTypes.INTEGER,
     },
     {
       sequelize,

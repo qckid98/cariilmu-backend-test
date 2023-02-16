@@ -3,15 +3,19 @@ const { user_courses, users, courses } = require("../models");
 class user_coursesController {
   static async store(req, res) {
     try {
-      let { user_id, course_id } = req.body;
+      let { userId, courseId } = req.body;
       const newUserCourse = await user_courses.create({
-        user_id: user_id,
-        course_id: course_id,
+        userId,
+        courseId,
       });
       if (newUserCourse) {
         res.status(201).json({
           message: "User course created successfully",
-          data: newUserCourse,
+          data: {
+            id: user_courses.id,
+            userId: newUserCourse.userId,
+            courseId: newUserCourse.courseId,
+          },
         });
       }
     } catch (error) {
@@ -26,13 +30,13 @@ class user_coursesController {
       const { id } = req.params;
       const userCourses = await user_courses.findAll({
         where: {
-          user_id: id,
+          userId: id,
         },
         include: [
           {
             model: courses,
             as: "course",
-            attributes: ["name", "description"],
+            attributes: ["title"],
           },
         ],
       });
@@ -52,19 +56,27 @@ class user_coursesController {
       const { id } = req.params;
       const userCourses = await user_courses.findAll({
         where: {
-          course_id: id,
+          courseId: id,
         },
         include: [
           {
             model: users,
             as: "user",
-            attributes: ["name", "email"],
+            attributes: ["name"],
           },
         ],
       });
+
+      const userCoursesData = userCourses.map((userCourse) => ({
+        id: userCourse.id,
+        userId: userCourse.userId,
+        courseId: userCourse.courseId,
+        user: userCourse.user,
+      }));
+
       res.status(200).json({
         message: "Success getting user courses",
-        data: userCourses,
+        data: userCoursesData,
       });
     } catch (error) {
       res.status(400).json({
@@ -73,14 +85,23 @@ class user_coursesController {
       });
     }
   }
-  static async update(req, res) {
+  static async updateByUser(req, res) {
     try {
-      const { id } = req.params;
-      let { user_id, course_id } = req.body;
-      const userCourse = await user_courses.findByPk(id);
+      const { userId, courseId } = req.params;
+      const { courseIdUpdate } = req.body;
+      const userCourse = await user_courses.findOne({
+        where: {
+          userId,
+          courseId,
+        },
+      });
+      if (userCourse == null) {
+        return res.status(400).json({
+          message: "User course not found",
+        });
+      }
       const updatedUserCourse = await userCourse.update({
-        user_id: user_id,
-        course_id: course_id,
+        courseId: courseIdUpdate,
       });
       res.status(200).json({
         message: "Success updating user course",
@@ -93,10 +114,15 @@ class user_coursesController {
       });
     }
   }
-  static async delete(req, res) {
+  static async deleteByUserandCourse(req, res) {
     try {
-      const { id } = req.params;
-      const userCourse = await user_courses.findByPk(id);
+      const { userId, courseId } = req.params;
+      const userCourse = await user_courses.findOne({
+        where: {
+          userId,
+          courseId,
+        },
+      });
       const deletedUserCourse = await userCourse.destroy();
       res.status(200).json({
         message: "Success deleting user course",

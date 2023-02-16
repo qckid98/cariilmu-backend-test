@@ -4,12 +4,23 @@ class userController {
   static async store(req, res) {
     try {
       let { name, email, password } = req.body;
-      const user = await users.create({
-        name,
-        email,
-        password,
-      });
-      return res.status(201).json(user);
+      if (!name || !email || !password) {
+        return res.status(400).json("Please fill all the fields");
+      } else {
+        const checkDuplicateEmail = await users.findOne({
+          where: { email: email },
+        });
+        if (checkDuplicateEmail) {
+          return res.status(400).json("Email already exists");
+        } else {
+          const user = await users.create({
+            name,
+            email,
+            password,
+          });
+          return res.status(201).json(user);
+        }
+      }
     } catch (error) {
       return res.status(400).json(error.message);
     }
@@ -45,7 +56,14 @@ class userController {
           where: { id: id },
         }
       );
-      return res.status(200).json(user);
+      return res.status(200).json({
+        message: "User updated successfully",
+        data: {
+          name,
+          email,
+          password,
+        },
+      });
     } catch (error) {
       return res.status(400).json(error.message);
     }
@@ -56,7 +74,12 @@ class userController {
       const user = await users.destroy({
         where: { id: id },
       });
-      return res.status(200).json(user);
+      return res.status(200).json({
+        message: "User deleted successfully",
+        data: {
+          id,
+        },
+      });
     } catch (error) {
       return res.status(400).json(error.message);
     }

@@ -3,10 +3,9 @@ const { courses } = require("../models");
 class coursesController {
   static async store(req, res) {
     try {
-      let { name, description, course_category_id } = req.body;
+      let { title, course_category_id } = req.body;
       const newCourse = await courses.create({
-        name: name,
-        description: description,
+        title: title,
         course_category_id: course_category_id,
       });
       if (newCourse) {
@@ -24,10 +23,10 @@ class coursesController {
   }
   static async showAll(req, res) {
     try {
-      const courses = await courses.findAll();
+      const course = await courses.findAll();
       res.status(200).json({
         message: "Success getting all courses",
-        data: courses,
+        data: course,
       });
     } catch (error) {
       res.status(400).json({
@@ -54,11 +53,10 @@ class coursesController {
   static async update(req, res) {
     try {
       const { id } = req.params;
-      let { name, description, course_category_id } = req.body;
+      let { title, course_category_id } = req.body;
       const course = await courses.findByPk(id);
       const updatedCourse = await course.update({
-        name: name,
-        description: description,
+        title: title,
         course_category_id: course_category_id,
       });
       res.status(200).json({
