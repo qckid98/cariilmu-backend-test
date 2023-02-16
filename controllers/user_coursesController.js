@@ -88,7 +88,6 @@ class user_coursesController {
   static async updateByUser(req, res) {
     try {
       const { userId, courseId } = req.params;
-      const { courseIdUpdate } = req.body;
       const userCourse = await user_courses.findOne({
         where: {
           userId,
@@ -100,6 +99,7 @@ class user_coursesController {
           message: "User course not found",
         });
       }
+      const { courseIdUpdate } = req.body;
       const updatedUserCourse = await userCourse.update({
         courseId: courseIdUpdate,
       });
