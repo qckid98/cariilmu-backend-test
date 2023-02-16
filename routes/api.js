@@ -37,7 +37,7 @@ router.put(
   user_coursesController.updateByUser
 );
 router.delete(
-  "/user_course/:id",
+  "/user/:userId/:courseId",
   auth,
   user_coursesController.deleteByUserandCourse
 );
